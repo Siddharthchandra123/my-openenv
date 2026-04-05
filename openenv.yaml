@@ -1,0 +1,24 @@
+name: supply-chain-optimization
+version: 1.0
+
+description: RL environment for supply chain optimization with stochastic demand and inventory management.
+
+action_space:
+  type: discrete
+  size: 4
+
+observation_space:
+  type: vector
+
+tasks:
+  - easy
+  - medium
+  - hard
+
+reward:
+  type: shaped
+  description: balances demand fulfillment, cost, and stockouts
+
+evaluation:
+  metric: normalized_score
+  range: [0.0, 1.0]
