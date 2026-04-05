@@ -6,7 +6,7 @@ env = SupplyEnv()
 
 @app.get("/")
 def home():
-    return {"status": "ok"}
+    return {"status": "running"}
 
 @app.get("/reset")
 def reset():
