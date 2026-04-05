@@ -1,4 +1,4 @@
-CONFIG = {
-    "num_warehouses": 1,
-    "max_steps": 30
-}
+DESCRIPTION = "Maintain inventory above demand for 30 steps"
+
+def success(total_reward):
+    return total_reward > 500

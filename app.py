@@ -5,8 +5,9 @@ app = FastAPI()
 env = SupplyEnv()
 
 @app.get("/")
-def home():
-    return {"status": "running"}
+def root():
+    obs, _ = env.reset()
+    return {"state": obs.tolist()}
 
 @app.get("/reset")
 def reset():

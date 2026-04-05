@@ -31,13 +31,13 @@ total_reward = 0
 for step in range(50):
     action = random.randint(0, env.action_space.n - 1)
 
-    obs, reward, terminated, truncated, _ = env.step(action)
+    obs, reward, done, info = env.step(action)
 
     total_reward += reward
 
     print(f"[STEP] step={step} reward={reward} total_reward={total_reward}")
 
-    if terminated or truncated:
+    if done:
         break
 
 print(f"[END] grade={grade(total_reward)} total_reward={total_reward}")

@@ -1,6 +1,8 @@
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
+from env.models import Observation
+
 
 class SupplyEnv(gym.Env):
 
@@ -24,7 +26,11 @@ class SupplyEnv(gym.Env):
             shape=(num_warehouses * 2,),
             dtype=np.float32
         )
-
+    def state(self):
+        return Observation(
+            inventory=self.inventory.tolist(),
+            demand=self.demand.tolist()
+        )
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
@@ -86,9 +92,9 @@ class SupplyEnv(gym.Env):
 
         terminated = False
         truncated = self.step_count >= self.max_steps
-
-        return self._get_obs(), reward, terminated, truncated, {}
-    
+        done = terminated or truncated
+        return self._get_obs(), reward, done, {}
+            
     def get_typed_state(self):
         from env.state import SupplyState
 

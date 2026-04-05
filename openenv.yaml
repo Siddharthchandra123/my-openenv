@@ -1,14 +1,15 @@
-name: supply-chain-optimization
+name: supply-chain-openenv
 version: 1.0
+tag: openenv
 
-description: RL environment for supply chain optimization with stochastic demand and inventory management.
+description: Real-world supply chain optimization environment
 
 action_space:
   type: discrete
   size: 4
 
 observation_space:
-  type: vector
+  type: structured
 
 tasks:
   - easy
@@ -17,8 +18,6 @@ tasks:
 
 reward:
   type: shaped
-  description: balances demand fulfillment, cost, and stockouts
-
-evaluation:
-  metric: normalized_score
   range: [0.0, 1.0]
+
+entrypoint: app.py
