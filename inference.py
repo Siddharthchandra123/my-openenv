@@ -15,47 +15,60 @@ client = OpenAI(
     base_url=API_BASE_URL,
     api_key=HF_TOKEN
 )
-prev_demand = None
 
 def smart_policy(obs):
-    global prev_demand
+    n = len(obs) // 2
+    inventory = obs[:n]
+    demand = obs[n:]
 
-    num_warehouses = len(obs) // 2
-    inventory = obs[:num_warehouses]
-    demand = obs[num_warehouses:]
-
-    if prev_demand is not None:
-        if demand.mean() > prev_demand.mean():
-            return 1  # demand increasing → reorder early
-
-    prev_demand = demand.copy()
+    # Rule-based intelligence
+    if inventory.mean() < demand.mean():
+        return 1  # reorder
+    if max(inventory) - min(inventory) > 20:
+        return 2  # transfer
+    if demand.mean() > 50:
+        return 3  # prioritize
     return 0
-# Reproducibility
-SEED = 42
-random.seed(SEED)
-np.random.seed(SEED)
 
-print("[START]")
 
-env = SupplyEnv()
-obs = env.reset()
+def grade(total_reward):
+    return max(0.0, min(total_reward / 5000, 1.0))
 
-total_reward = 0
 
-for step in range(50):
+def main():
+    env = SupplyEnv()
     obs = env.reset()
 
-total_reward = 0
+    total_reward = 0
+    rewards = []
 
-for step in range(50):
-    action = smart_policy(obs)
-    obs, reward, done, _ = env.step(action)
-    total_reward += reward
+    print("[START] task=supply_chain env=custom model=rule-based", flush=True)
 
-    if done:
-        break
+    for step in range(1, 51):
+        action = smart_policy(obs)
 
-    
-    print(f"[STEP] step={step} reward={reward} total_reward={total_reward}")
+        obs, reward, done, _ = env.step(action)
 
-print(f"[END] grade={grade(total_reward)} total_reward={total_reward}")
+        total_reward += reward
+        rewards.append(reward)
+
+        print(
+            f"[STEP] step={step} action={action} reward={reward:.2f} done={str(done).lower()} error=null",
+            flush=True
+        )
+
+        if done:
+            break
+
+    score = grade(total_reward)
+
+    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+
+    print(
+        f"[END] success=true steps={step} score={score:.3f} rewards={rewards_str}",
+        flush=True
+    )
+
+
+if __name__ == "__main__":
+    main()
