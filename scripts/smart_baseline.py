@@ -5,13 +5,15 @@ from env.supply_env import SupplyEnv
 import numpy as np
 
 env = SupplyEnv()
-obs, _ = env.reset()
+obs = env.reset()
+
+# Handle Pydantic Observation
 
 total_reward = 0
 
 for step in range(50):
-    inventory = obs[:env.num_warehouses]
-    demand = obs[env.num_warehouses:]
+    inventory = np.array(obs.inventory)
+    demand = np.array(obs.demand)
 
     # 🔥 Simple decision logic
     if np.sum(inventory) < np.sum(demand):
@@ -21,7 +23,7 @@ for step in range(50):
     else:
         action = 0  # do nothing
 
-    obs, reward, terminated, truncated, _ = env.step(action)
+    obs, reward, terminated, truncated = env.step(action)
     total_reward += reward
 
     if terminated or truncated:
