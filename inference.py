@@ -15,28 +15,20 @@ client = OpenAI(
     base_url=API_BASE_URL,
     api_key=HF_TOKEN
 )
+prev_demand = None
+
 def smart_policy(obs):
+    global prev_demand
+
     num_warehouses = len(obs) // 2
     inventory = obs[:num_warehouses]
     demand = obs[num_warehouses:]
 
-    avg_inventory = inventory.mean()
-    avg_demand = demand.mean()
+    if prev_demand is not None:
+        if demand.mean() > prev_demand.mean():
+            return 1  # demand increasing → reorder early
 
-    # 🔥 Rule 1: If inventory is too low → reorder
-    if avg_inventory < avg_demand:
-        return 1  # reorder
-
-    # 🔥 Rule 2: If imbalance between warehouses → transfer
-    if num_warehouses > 1:
-        if max(inventory) - min(inventory) > 20:
-            return 2  # transfer
-
-    # 🔥 Rule 3: If demand is high → prioritize
-    if avg_demand > 50:
-        return 3  # prioritize demand
-
-    # Default
+    prev_demand = demand.copy()
     return 0
 # Reproducibility
 SEED = 42
@@ -46,7 +38,7 @@ np.random.seed(SEED)
 print("[START]")
 
 env = SupplyEnv()
-obs, _ = env.reset()
+obs = env.reset()
 
 total_reward = 0
 

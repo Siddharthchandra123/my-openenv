@@ -1,10 +1,15 @@
 from env.supply_env import SupplyEnv
 
 env = SupplyEnv()
+obs = env.reset()
 
-obs, _ = env.reset()
-print("Initial State:", obs)
+print("Initial obs:", obs)
 
-for _ in range(5):
-    obs, reward, done, truncated, _ = env.step(1)
-    print("Step → Reward:", reward)
+for step in range(5):
+    action = env.action_space.sample()
+    obs, reward, done, _ = env.step(action)
+
+    print(f"Step {step} | Action: {action} | Reward: {reward}")
+
+    if done:
+        break

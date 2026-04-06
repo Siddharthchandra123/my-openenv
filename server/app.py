@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from env.supply_env import SupplyEnv
 
