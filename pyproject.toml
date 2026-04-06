@@ -18,5 +18,8 @@ dependencies = [
     "gymnasium"
 ]
 
+[project.scripts]
+server = "server.app:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
