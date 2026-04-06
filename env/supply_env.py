@@ -26,20 +26,20 @@ class SupplyEnv(gym.Env):
             shape=(num_warehouses * 2,),
             dtype=np.float32
         )
+    from env.models import Observation
+
     def state(self):
         return Observation(
             inventory=self.inventory.tolist(),
             demand=self.demand.tolist()
         )
-    def reset(self, seed=None, options=None):
-        super().reset(seed=seed)
 
+    def reset(self):
         self.step_count = 0
-
         self.inventory = np.random.randint(50, 100, size=self.num_warehouses)
-        self.demand = np.random.randint(20, 60, size=self.num_warehouses)
+        self.demand = np.random.randint(30, 60, size=self.num_warehouses)
 
-        return self._get_obs(), {}
+        return self.state()   # ✅ IMPORTANT
     
     def step(self, action):
         self.step_count += 1
@@ -93,7 +93,7 @@ class SupplyEnv(gym.Env):
         terminated = False
         truncated = self.step_count >= self.max_steps
         done = terminated or truncated
-        return self._get_obs(), reward, done, {}
+        return self.state(), float(reward), done, {}
             
     def get_typed_state(self):
         from env.state import SupplyState
@@ -106,8 +106,6 @@ class SupplyEnv(gym.Env):
     def _get_obs(self):
         return np.concatenate([self.inventory, self.demand]).astype(np.float32)
 
-    def state(self):
-        return self._get_obs()
 
 def check_env():
     env = SupplyEnv()

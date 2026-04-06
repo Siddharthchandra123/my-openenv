@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "supplychain-openenv"
+version = "0.1.0"
+description = "Supply Chain Optimization RL Environment"
+authors = [
+    { name="Siddharth", email="you@example.com" }
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "numpy",
+    "pydantic",
+    "openenv-core>=0.2.0",
+    "gymnasium"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
