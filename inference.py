@@ -4,7 +4,6 @@ from openai import OpenAI
 from env.supply_env import SupplyEnv
 
 
-# ---------------- CONFIG ----------------
 API_BASE_URL = os.getenv("API_BASE_URL")
 MODEL_NAME = os.getenv("MODEL_NAME")
 HF_TOKEN = os.getenv("HF_TOKEN")
@@ -12,14 +11,12 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
 
 
-# ---------------- SAFETY ----------------
 def safe_obs(obs):
     if hasattr(obs, "inventory"):
         return np.array(obs.inventory + obs.demand, dtype=np.float32)
     return obs
 
 
-# ---------------- SMART FALLBACK ----------------
 def smart_policy(obs):
     obs = safe_obs(obs)
     n = len(obs) // 2
@@ -35,7 +32,6 @@ def smart_policy(obs):
     return 0
 
 
-# ---------------- LLM POLICY ----------------
 def llm_policy(obs):
     obs = safe_obs(obs)
 
@@ -69,20 +65,16 @@ def llm_policy(obs):
         return smart_policy(obs)
 
 
-# ---------------- FINAL POLICY (FAST + SAFE) ----------------
 def final_policy(obs, step):
-    # Limit LLM usage for speed (<20 min requirement safe)
     if step <= 5:
         return llm_policy(obs)
     return smart_policy(obs)
 
 
-# ---------------- GRADER ----------------
 def grade(total_reward):
     return max(0.0, min(total_reward / 5000, 1.0))
 
 
-# ---------------- RUN ONE TASK ----------------
 def run_task(env, task_name):
     obs = safe_obs(env.reset())
 
@@ -126,11 +118,9 @@ def run_task(env, task_name):
         )
 
 
-# ---------------- MAIN ----------------
 def main():
     env = SupplyEnv()
 
-    # REQUIRED: at least 3 tasks
     tasks = ["inventory", "balance", "fulfillment"]
 
     for task in tasks:

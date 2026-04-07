@@ -26,20 +26,20 @@ class SupplyEnv(gym.Env):
             shape=(num_warehouses * 2,),
             dtype=np.float32
         )
-        self.task_type = "inventory"  # default
     from env.models import Observation
 
     def state(self):
-        return self._get_obs()
+        return Observation(
+            inventory=self.inventory.tolist(),
+            demand=self.demand.tolist()
+        )
 
-    def reset(self, task_type="inventory"):
-        self.task_type = task_type
+    def reset(self):
         self.step_count = 0
-
         self.inventory = np.random.randint(50, 100, size=self.num_warehouses)
         self.demand = np.random.randint(30, 60, size=self.num_warehouses)
 
-        return self._get_obs()   # ✅ IMPORTANT
+        return self.state()
     
     def step(self, action):
         self.step_count += 1
@@ -54,7 +54,7 @@ class SupplyEnv(gym.Env):
 
         # Unmet demand penalty (reduced)
         unmet = self.demand - fulfilled
-        reward -= np.sum(unmet) * 1.2   # 🔥 reduced from 2
+        reward -= np.sum(unmet) * 1.2   
 
         # Holding cost (lighter)
         holding_cost = np.sum(self.inventory) * 0.03
@@ -75,7 +75,6 @@ class SupplyEnv(gym.Env):
         elif action == 3:
             reward += 3
 
-        # 🔥 NEW: Fulfillment ratio reward (VERY IMPORTANT)
         total_demand = np.sum(self.demand) + 1
         fulfillment_ratio = np.sum(fulfilled) / total_demand
         reward += fulfillment_ratio * 20
@@ -83,11 +82,9 @@ class SupplyEnv(gym.Env):
         # New demand (slightly reduced variance)
         self.demand = np.random.randint(30, 60, size=self.num_warehouses)
 
-        # 🔥 Auto restock (prevents collapse)
         self.inventory += np.random.randint(5, 15, size=self.num_warehouses)
         self.inventory = np.clip(self.inventory, 0, 200)
 
-        # 🔥 Cap extreme negative rewards
         reward = max(reward, -150)
 
         terminated = False
