@@ -86,7 +86,7 @@ def grade(total_reward):
 # ---------------- MAIN ----------------
 def main():
     env = SupplyEnv()
-    obs = safe_obs(obs)
+    obs = safe_obs(env.reset())
 
     total_reward = 0
     rewards = []
