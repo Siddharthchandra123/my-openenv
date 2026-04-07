@@ -8,7 +8,7 @@ env = SupplyEnv()
 @app.get("/")
 def root():
     obs = env.reset()
-    return {"state": obs.dict()}   
+    return {"state": obs.tolist()}   
 
 @app.post("/reset")
 @app.get("/reset")
