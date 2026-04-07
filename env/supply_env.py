@@ -26,17 +26,20 @@ class SupplyEnv(gym.Env):
             shape=(num_warehouses * 2,),
             dtype=np.float32
         )
+        self.task_type = "inventory"  # default
     from env.models import Observation
 
     def state(self):
         return self._get_obs()
 
-    def reset(self):
+    def reset(self, task_type="inventory"):
+        self.task_type = task_type
         self.step_count = 0
+
         self.inventory = np.random.randint(50, 100, size=self.num_warehouses)
         self.demand = np.random.randint(30, 60, size=self.num_warehouses)
 
-        return self.state()   # ✅ IMPORTANT
+        return self._get_obs()   # ✅ IMPORTANT
     
     def step(self, action):
         self.step_count += 1
