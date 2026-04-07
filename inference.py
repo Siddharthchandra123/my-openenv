@@ -27,6 +27,11 @@ client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
 
 
 # ---------------- SMART FALLBACK ----------------
+def safe_obs(obs):
+    if hasattr(obs, "inventory"):
+        # convert Observation → array
+        return np.array(obs.inventory + obs.demand, dtype=np.float32)
+    return obs
 def smart_policy(obs):
     n = len(obs) // 2
     inventory = obs[:n]
@@ -81,7 +86,7 @@ def grade(total_reward):
 # ---------------- MAIN ----------------
 def main():
     env = SupplyEnv()
-    obs = env.reset()
+    obs = safe_obs(obs)
 
     total_reward = 0
     rewards = []
