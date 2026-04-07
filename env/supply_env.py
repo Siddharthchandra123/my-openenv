@@ -29,10 +29,7 @@ class SupplyEnv(gym.Env):
     from env.models import Observation
 
     def state(self):
-        return Observation(
-            inventory=self.inventory.tolist(),
-            demand=self.demand.tolist()
-        )
+        return self._get_obs()
 
     def reset(self):
         self.step_count = 0
